@@ -1,0 +1,61 @@
+ul{
+    list-style-type: none;
+}
+div[class*="col"]{
+    padding: 1px;
+}
+.row{
+    position: relative;
+}
+.start{
+    border: solid 1px white;
+    min-height: 75px;
+    background-color:#eee;
+}
+.start:hover{
+    background:#ddd;
+}
+.start svg{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 100;
+    color: tomato;
+    display: none;
+}
+.start:hover > svg{
+   display: block;
+   cursor: pointer;
+   margin: 10px;
+   font-size: 22px;
+}
+#add-row{
+    position: absolute;
+    top: 50px;
+    left: 0;
+    padding: 10px;
+    cursor: pointer;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background: skyblue;
+}
+#column-list{
+    padding: 0px;
+    color: #eee;
+}
+#column-list li{
+    display: flex;
+}
+#column-list li:hover{
+    cursor: pointer;
+    background:red;
+    color: #999;
+}
+#column-list div{
+    border: solid 1px white;
+    min-height: 40px;
+    background-color:#eee;
+    opacity: 0.9;
+    text-align: center;
+    line-height: 40px;
+}

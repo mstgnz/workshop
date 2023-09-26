@@ -1,0 +1,136 @@
+<canvas id="snake"></canvas>
+
+<script>
+    class Snake{
+        constructor(square=400){
+            this.canvas = document.getElementById('snake');
+            this.canvas.width = square;
+            this.canvas.height = square;
+            this.ctx = this.canvas.getContext('2d');
+            document.addEventListener('keydown', this.onKeyPress.bind(this));
+        }
+
+        init(){
+            this.size = Math.floor(Math.sqrt(Math.floor(Math.sqrt(this.canvas.width))));
+            this.positionX = this.positionY = 0;
+            this.appleX = this.appleY = this.size;
+            this.tailSize = this.size;
+            this.trail = [];
+            this.gridSize = this.tileCount = Math.floor(Math.sqrt(this.canvas.width));
+            this.velocityX = this.velocityY = 0;
+            this.timer = setInterval(this.loop.bind(this), 1000 / 15);
+        }
+
+        loop(){
+            this.update();
+            this.draw();
+        }
+
+        reset(){
+            clearInterval(this.timer);
+            this.init();
+        }
+
+        draw(){
+            // Board
+            this.ctx.fillStyle = 'black';
+            this.ctx.fillRect(0,0,this.canvas.width, this.canvas.height);
+            // Score
+            this.ctx.fillStyle = 'white';
+            this.ctx.font = '20px Arial';
+            this.ctx.fillText(this.tailSize - this.size, 20, 40);
+            // Snake
+            let pointX, pointY;
+            this.ctx.fillStyle = 'yellow';
+            for (let i = 0; i < this.trail.length; i++) {
+                pointX = this.trail[i].positionX * this.gridSize;
+                pointY = this.trail[i].positionY * this.gridSize;
+                if(this.trail.length == i+1){
+                    this.ctx.fillStyle = 'red';
+                }
+                this.ctx.fillRect(pointX, pointY, this.gridSize - this.size / 2, this.gridSize - this.size / 2);
+                if(this.trail.length == i+1){
+                    this.ctx.beginPath();
+                    this.ctx.fillStyle = 'white';
+                    this.ctx.arc(pointX+9, pointY+9, 4, 0, 2 * Math.PI);
+                    this.ctx.fill();
+                }
+                
+            }
+            // Apple
+            this.ctx.fillStyle = 'pink';
+            this.ctx.fillRect(this.appleX * this.gridSize, this.appleY * this.gridSize, this.gridSize - this.size/2, this.gridSize - this.size / 2);
+
+        }
+
+        update(){
+            this.positionX += this.velocityX;
+            this.positionY += this.velocityY;
+
+            if(this.positionX < 0){
+                this.positionX = this.tileCount -1;
+            }
+            if(this.positionY < 0){
+                this.positionY = this.tileCount -1;
+            }
+            if(this.positionX > this.tileCount -1){
+                this.positionX = 0;
+            }
+            if(this.positionY > this.tileCount -1){
+                this.positionY = 0;
+            }
+
+            this.trail.forEach(t=>{
+                if(this.positionX === t.positionX && this.positionY === t.positionY){
+                    this.reset();
+                }
+            })
+            this.trail.push({positionX: this.positionX, positionY: this.positionY});
+
+            while(this.trail.length > this.tailSize){
+                this.trail.shift();
+            }
+
+            if(this.appleX === this.positionX && this.appleY === this.positionY){
+                this.tailSize ++
+                this.createApple();
+            }
+
+        }
+
+        createApple(){
+            const random = Math.floor(Math.random() * this.tileCount);
+            this.trail.forEach(t=>{
+                if(t.positionX !== random || t.positionY !== random){
+                    this.appleX = this.appleY = random;
+                }else{
+                    this.createApple();
+                }
+            });
+        }
+
+        onKeyPress(e){
+            if(e.keyCode === 37 && this.velocityX !== 1){
+                this.velocityX = -1;
+                this.velocityY = 0;
+            }
+            if(e.keyCode === 38 && this.velocityY !== 1){
+                this.velocityX = 0;
+                this.velocityY = -1;
+            }
+            if(e.keyCode === 39 && this.velocityX !== -1){
+                this.velocityX = 1;
+                this.velocityY = 0;
+            }
+            if(e.keyCode === 40 && this.velocityY !== -1){
+                this.velocityX = 0;
+                this.velocityY = 1;
+            }
+        }
+    }
+
+    const snake = new Snake(400);
+    window.onload = () => {
+        snake.init();
+    }
+</script>

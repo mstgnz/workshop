@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Wizard</title>
+</head>
+<body>
+    
+    <!-- Design Wizard -->
+    <section id="wizard"></section>
+
+     <!-- Satır Ekle -->
+    <div id="add-row" data-toggle="modal" data-target="#rowModal" title="SATIR EKLE">
+        <i class="fas fa-lg fa-plus-circle"></i>
+    </div>
+
+    <!-- Satır Ayarları -->
+    <div class="modal fade" id="rowModal" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Satır Ekle</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Ekran Tipi</span>
+                        </div>
+                        <select class="custom-select" name="screen-type">
+                            <option value="0" selected>Normal</option>
+                            <option value="1">Tam Ekran</option>
+                        </select>
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Satır Adı</span>
+                        </div>
+                        <input type="text" class="form-control" name="rowname">
+                    </div>
+                    <span>Sütun Tipi Seçiniz</span>
+                    <ul id="column-list">
+                        <li onclick="wizard.setColumn(this,[12])"><div class="col-12">12</div></li>
+                        <li onclick="wizard.setColumn(this,[6,6])"><div class="col-6">6</div><div class="col-6">6</div></li>
+                        <li onclick="wizard.setColumn(this,[4,4,4])"><div class="col-4">4</div><div class="col-4">4</div><div class="col-4">4</div></li>
+                        <li onclick="wizard.setColumn(this,[3,3,3,3])"><div class="col-3">3</div><div class="col-3">3</div><div class="col-3">3</div><div class="col-3">3</div></li>
+                        <li onclick="wizard.setColumn(this,[3,6,3])"><div class="col-3">3</div><div class="col-6">6</div><div class="col-3">3</div></li>
+                        <li onclick="wizard.setColumn(this,[3,3,6])"><div class="col-3">3</div><div class="col-3">3</div><div class="col-6">6</div></li>
+                        <li onclick="wizard.setColumn(this,[6,3,3])"><div class="col-6">6</div><div class="col-3">3</div><div class="col-3">3</div></li>
+                        <li onclick="wizard.setColumn(this,[4,8])"><div class="col-4">4</div><div class="col-8">8</div></li>
+                        <li onclick="wizard.setColumn(this,[8,4])"><div class="col-8">8</div><div class="col-4">4</div></li>
+                    </ul>
+                    <input type="hidden" id="columnType" disabled />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary rowModalSubmit">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sütun Ayarları -->
+    <div class="modal fade" id="columnModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Sütun Ayarları</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">ID</span>
+                        </div>
+                        <input type="text" name="id" value="" disabled />
+                    </div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Modül</span>
+                        </div>
+                        <select class="custom-select" name="module">
+                            <option value="navbar">NavBar</option>
+                            <option value="carousel">Slider</option>
+                            <option value="banner">Banner</option>
+                            <option value="card">Card</option>
+                            <option value="jumbotron">Jumbotron</option>
+                            <option value="thumbnail">Thumbnail</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary columnModalSubmit" data-dismiss="modal">Ekle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
+    <script src="wizard.js"></script>
+ 
+</body>
+</html>
