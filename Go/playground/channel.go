@@ -10,7 +10,7 @@ func main() {
 	ch := make(chan string)
 	fmt.Println("chan created")
 	go sort(ch)
-	fmt.Println("call sorf func with gorotine")
+	fmt.Println("call sort func with goroutine")
 	fmt.Println("waiting result....")
 	result := <-ch
 	fmt.Println("result : ", result)
