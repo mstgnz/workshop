@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/alexedwards/scs/redisstore v0.0.0-20231113091146-cef4b05350c8
+	github.com/alexedwards/scs/v2 v2.7.0
 	github.com/go-chi/chi/v5 v5.0.11
 	github.com/gomodule/redigo v1.8.9
 	github.com/jackc/pgconn v1.14.1

@@ -5,6 +5,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/alexedwards/scs/v2"
 	"project/data"
 )
 
