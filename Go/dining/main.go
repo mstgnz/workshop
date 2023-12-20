@@ -26,7 +26,7 @@ type Philosopher struct {
 	leftFork  int
 }
 
-// philosophers is list of all philosophers.
+// philosophers are list of all philosophers.
 var philosophers = []Philosopher{
 	{name: "Plato", leftFork: 4, rightFork: 0},
 	{name: "Socrates", leftFork: 0, rightFork: 1},
@@ -42,8 +42,8 @@ var thinkTime = 3 * time.Second // how long a philosopher thinks
 var sleepTime = 1 * time.Second // how long to wait when printing things out
 
 // *** added this
-var orderMutex sync.Mutex       // a mutex for the slice orderFinished; part of challenge!
-var orderFinished []string      // the order in which philosophers finish dining and leave; part of challenge!
+var orderMutex sync.Mutex  // a mutex for the slice orderFinished; part of challenge!
+var orderFinished []string // the order in which philosophers finish dining and leave; part of challenge!
 
 func main() {
 	// print out a welcome message
@@ -59,7 +59,7 @@ func main() {
 
 	// print out finished message
 	fmt.Println("The table is empty.")
-	
+
 	// *** added this
 	time.Sleep(sleepTime)
 	fmt.Printf("Order finished: %s.\n", strings.Join(orderFinished, ", "))
@@ -91,7 +91,7 @@ func dine() {
 	// Start the meal by iterating through our slice of Philosophers.
 	for i := 0; i < len(philosophers); i++ {
 		// fire off a goroutine for the current philosopher
-		go diningProblem(philosophers[i], wg, forks, seated)
+		go diningProblem(philosophers[i], forks, wg, seated)
 	}
 
 	// Wait for the philosophers to finish. This blocks until the wait group is 0.
@@ -102,12 +102,12 @@ func dine() {
 // philosopher, our WaitGroup to determine when everyone is done, a map containing the mutexes for every
 // fork on the table, and a WaitGroup used to pause execution of every instance of this goroutine
 // until everyone is seated at the table.
-func diningProblem(philosopher Philosopher, wg *sync.WaitGroup, forks map[int]*sync.Mutex, seated *sync.WaitGroup) {
+func diningProblem(philosopher Philosopher, forks map[int]*sync.Mutex, wg, seated *sync.WaitGroup) {
 	defer wg.Done()
 
 	// seat the philosopher at the table
 	fmt.Printf("%s is seated at the table.\n", philosopher.name)
-	
+
 	// Decrement the seated WaitGroup by one.
 	seated.Done()
 
@@ -131,7 +131,7 @@ func diningProblem(philosopher Philosopher, wg *sync.WaitGroup, forks map[int]*s
 			forks[philosopher.rightFork].Lock()
 			fmt.Printf("\t%s takes the right fork.\n", philosopher.name)
 		}
-		
+
 		// By the time we get to this line, the philosopher has a lock (mutex) on both forks.
 		fmt.Printf("\t%s has both forks and is eating.\n", philosopher.name)
 		time.Sleep(eatTime)
@@ -148,7 +148,7 @@ func diningProblem(philosopher Philosopher, wg *sync.WaitGroup, forks map[int]*s
 	}
 
 	// The philosopher has finished eating, so print out a message.
-	fmt.Println(philosopher.name, "is satisified.")
+	fmt.Println(philosopher.name, "is satisfied.")
 	fmt.Println(philosopher.name, "left the table.")
 
 	// *** added this
