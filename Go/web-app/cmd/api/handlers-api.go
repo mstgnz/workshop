@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -80,7 +81,7 @@ func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
+		_, _ = w.Write(out)
 	} else {
 		j := jsonResponse{
 			OK:      false,
@@ -94,7 +95,7 @@ func (app *application) GetPaymentIntent(w http.ResponseWriter, r *http.Request)
 		}
 
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(out)
+		_, _ = w.Write(out)
 	}
 }
 
@@ -116,7 +117,7 @@ func (app *application) GetWidgetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+	_, _ = w.Write(out)
 }
 
 // Invoice describes the JSON payload sent to the microservice
@@ -251,7 +252,7 @@ func (app *application) CreateCustomerAndSubscribeToPlan(w http.ResponseWriter, 
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(out)
+	_, _ = w.Write(out)
 }
 
 // callInvoiceMicro calls the invoicing microservice
@@ -273,7 +274,9 @@ func (app *application) callInvoiceMicro(inv Invoice) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	return nil
 }
@@ -320,40 +323,40 @@ func (app *application) CreateAuthToken(w http.ResponseWriter, r *http.Request) 
 
 	err := app.readJSON(w, r, &userInput)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	// get the user from the database by email; send error if invalid email
 	user, err := app.DB.GetUserByEmail(userInput.Email)
 	if err != nil {
-		app.invalidCredentials(w)
+		_ = app.invalidCredentials(w)
 		return
 	}
 
 	// validate the password; send error if invalid password
 	validPassword, err := app.passwordMatches(user.Password, userInput.Password)
 	if err != nil {
-		app.invalidCredentials(w)
+		_ = app.invalidCredentials(w)
 		return
 	}
 
 	if !validPassword {
-		app.invalidCredentials(w)
+		_ = app.invalidCredentials(w)
 		return
 	}
 
 	// generate the token
 	token, err := models.GenerateToken(user.ID, 24*time.Hour, models.ScopeAuthentication)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	// save to database
 	err = app.DB.InsertToken(token, user)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -402,7 +405,7 @@ func (app *application) CheckAuthentication(w http.ResponseWriter, r *http.Reque
 	// validate the token, and get associated user
 	user, err := app.authenticateToken(r)
 	if err != nil {
-		app.invalidCredentials(w)
+		_ = app.invalidCredentials(w)
 		return
 	}
 
@@ -413,7 +416,7 @@ func (app *application) CheckAuthentication(w http.ResponseWriter, r *http.Reque
 	}
 	payload.Error = false
 	payload.Message = fmt.Sprintf("authenticated user %s", user.Email)
-	app.writeJSON(w, http.StatusOK, payload)
+	_ = app.writeJSON(w, http.StatusOK, payload)
 }
 
 // VirtualTerminalPaymentSucceeded displays a page with receipt information
@@ -434,7 +437,7 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 
 	err := app.readJSON(w, r, &txnData)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -445,13 +448,13 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 
 	pi, err := card.RetrievePaymentIntent(txnData.PaymentIntent)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	pm, err := card.GetPaymentMethod(txnData.PaymentMethod)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -473,11 +476,11 @@ func (app *application) VirtualTerminalPaymentSucceeded(w http.ResponseWriter, r
 
 	_, err = app.SaveTransaction(txn)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, txn)
+	_ = app.writeJSON(w, http.StatusOK, txn)
 }
 
 // SendPasswordResetEmail sends an email with a signed url to allow user to reset password
@@ -488,7 +491,7 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -501,14 +504,14 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 		}
 		resp.Error = true
 		resp.Message = "No matching email found on our system"
-		app.writeJSON(w, http.StatusAccepted, resp)
+		_ = app.writeJSON(w, http.StatusAccepted, resp)
 		return
 	}
 
 	link := fmt.Sprintf("%s/reset-password?email=%s", app.config.frontend, payload.Email)
 
 	sign := urlsigner.Signer{
-		Secret: []byte(app.config.secretkey),
+		Secret: []byte(app.config.secretKey),
 	}
 
 	signedLink := sign.GenerateTokenFromString(link)
@@ -523,7 +526,7 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	err = app.SendMail("info@widgets.com", payload.Email, "Password Reset Request", "password-reset", data)
 	if err != nil {
 		app.errorLog.Println(err)
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -534,7 +537,7 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 
 	resp.Error = false
 
-	app.writeJSON(w, http.StatusCreated, resp)
+	_ = app.writeJSON(w, http.StatusCreated, resp)
 }
 
 // ResetPassword resets a user's password in the database
@@ -546,35 +549,35 @@ func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	encyrptor := encryption.Encryption{
-		Key: []byte(app.config.secretkey),
+		Key: []byte(app.config.secretKey),
 	}
 
 	realEmail, err := encyrptor.Decrypt(payload.Email)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	user, err := app.DB.GetUserByEmail(realEmail)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	newHash, err := bcrypt.GenerateFromPassword([]byte(payload.Password), 12)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	err = app.DB.UpdatePasswordForUser(user, string(newHash))
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -585,7 +588,7 @@ func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	resp.Error = false
 	resp.Message = "password changed"
 
-	app.writeJSON(w, http.StatusCreated, resp)
+	_ = app.writeJSON(w, http.StatusCreated, resp)
 }
 
 // AllSales returns all sales as a slice
@@ -597,13 +600,13 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	allSales, lastPage, totalRecords, err := app.DB.GetAllOrdersPaginated(payload.PageSize, payload.CurrentPage)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -621,7 +624,7 @@ func (app *application) AllSales(w http.ResponseWriter, r *http.Request) {
 	resp.TotalRecords = totalRecords
 	resp.Orders = allSales
 
-	app.writeJSON(w, http.StatusOK, resp)
+	_ = app.writeJSON(w, http.StatusOK, resp)
 }
 
 // AllSubscriptions returns all subscriptions as a slice
@@ -633,13 +636,13 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 
 	err := app.readJSON(w, r, &payload)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	allSales, lastPage, totalRecords, err := app.DB.GetAllSubscriptionsPaginated(payload.PageSize, payload.CurrentPage)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -657,7 +660,7 @@ func (app *application) AllSubscriptions(w http.ResponseWriter, r *http.Request)
 	resp.TotalRecords = totalRecords
 	resp.Orders = allSales
 
-	app.writeJSON(w, http.StatusOK, resp)
+	_ = app.writeJSON(w, http.StatusOK, resp)
 }
 
 // GetSale returns one sale as json, by id
@@ -667,11 +670,11 @@ func (app *application) GetSale(w http.ResponseWriter, r *http.Request) {
 
 	order, err := app.DB.GetOrderByID(orderID)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, order)
+	_ = app.writeJSON(w, http.StatusOK, order)
 }
 
 // RefundCharge accepts a json payload and tries to refund a charge
@@ -685,7 +688,7 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 	err := app.readJSON(w, r, &chargeToRefund)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -699,14 +702,14 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 
 	err = card.Refund(chargeToRefund.PaymentIntent, chargeToRefund.Amount)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	// update status in db
 	err = app.DB.UpdateOrderStatus(chargeToRefund.ID, 2)
 	if err != nil {
-		app.badRequest(w, r, errors.New("the charge was refunded, but the database could not be updated"))
+		_ = app.badRequest(w, r, errors.New("the charge was refunded, but the database could not be updated"))
 		return
 	}
 
@@ -717,7 +720,7 @@ func (app *application) RefundCharge(w http.ResponseWriter, r *http.Request) {
 	resp.Error = false
 	resp.Message = "Charge refunded"
 
-	app.writeJSON(w, http.StatusOK, resp)
+	_ = app.writeJSON(w, http.StatusOK, resp)
 
 }
 
@@ -731,7 +734,7 @@ func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Reques
 
 	err := app.readJSON(w, r, &subToCancel)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -743,14 +746,14 @@ func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Reques
 
 	err = card.CancelSubscription(subToCancel.PaymentIntent)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	// update status in db
 	err = app.DB.UpdateOrderStatus(subToCancel.ID, 3)
 	if err != nil {
-		app.badRequest(w, r, errors.New("the subscription was cancelled, but the database could not be updated"))
+		_ = app.badRequest(w, r, errors.New("the subscription was cancelled, but the database could not be updated"))
 		return
 	}
 
@@ -761,18 +764,18 @@ func (app *application) CancelSubscription(w http.ResponseWriter, r *http.Reques
 	resp.Error = false
 	resp.Message = "Subscription cancelled"
 
-	app.writeJSON(w, http.StatusOK, resp)
+	_ = app.writeJSON(w, http.StatusOK, resp)
 }
 
 // AllUsers returns a JSON file listing all admin users
 func (app *application) AllUsers(w http.ResponseWriter, r *http.Request) {
 	allUsers, err := app.DB.GetAllUsers()
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, allUsers)
+	_ = app.writeJSON(w, http.StatusOK, allUsers)
 }
 
 // OneUser gets one user by id (from the url) and returns it as JSON
@@ -782,11 +785,11 @@ func (app *application) OneUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := app.DB.GetOneUser(userID)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, user)
+	_ = app.writeJSON(w, http.StatusOK, user)
 }
 
 // EditUser is the handler for adding or editing an existing user
@@ -798,39 +801,39 @@ func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
 
 	err := app.readJSON(w, r, &user)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	if userID > 0 {
 		err = app.DB.EditUser(user)
 		if err != nil {
-			app.badRequest(w, r, err)
+			_ = app.badRequest(w, r, err)
 			return
 		}
 
 		if user.Password != "" {
 			newHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 			if err != nil {
-				app.badRequest(w, r, err)
+				_ = app.badRequest(w, r, err)
 				return
 			}
 
 			err = app.DB.UpdatePasswordForUser(user, string(newHash))
 			if err != nil {
-				app.badRequest(w, r, err)
+				_ = app.badRequest(w, r, err)
 				return
 			}
 		}
 	} else {
 		newHash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
 		if err != nil {
-			app.badRequest(w, r, err)
+			_ = app.badRequest(w, r, err)
 			return
 		}
 		err = app.DB.AddUser(user, string(newHash))
 		if err != nil {
-			app.badRequest(w, r, err)
+			_ = app.badRequest(w, r, err)
 			return
 		}
 	}
@@ -841,7 +844,7 @@ func (app *application) EditUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp.Error = false
-	app.writeJSON(w, http.StatusOK, resp)
+	_ = app.writeJSON(w, http.StatusOK, resp)
 }
 
 // DeleteUser deletes a user, and all associated tokens, from the database
@@ -851,7 +854,7 @@ func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	err := app.DB.DeleteUser(userID)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -861,5 +864,5 @@ func (app *application) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp.Error = false
-	app.writeJSON(w, http.StatusOK, resp)
+	_ = app.writeJSON(w, http.StatusOK, resp)
 }

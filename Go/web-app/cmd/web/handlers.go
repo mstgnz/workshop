@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -211,7 +212,9 @@ func (app *application) callInvoiceMicro(inv Invoice) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	return nil
 }
@@ -362,7 +365,7 @@ func (app *application) LoginPage(w http.ResponseWriter, r *http.Request) {
 
 // PostLoginPage handles the posted login form
 func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
-	app.Session.RenewToken(r.Context())
+	_ = app.Session.RenewToken(r.Context())
 
 	err := r.ParseForm()
 	if err != nil {
@@ -385,8 +388,8 @@ func (app *application) PostLoginPage(w http.ResponseWriter, r *http.Request) {
 
 // Logout logs the user out
 func (app *application) Logout(w http.ResponseWriter, r *http.Request) {
-	app.Session.Destroy(r.Context())
-	app.Session.RenewToken(r.Context())
+	_ = app.Session.Destroy(r.Context())
+	_ = app.Session.RenewToken(r.Context())
 
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

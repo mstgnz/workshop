@@ -1,6 +1,8 @@
 package cards
 
 import (
+	"errors"
+
 	"github.com/stripe/stripe-go/v72"
 	"github.com/stripe/stripe-go/v72/customer"
 	"github.com/stripe/stripe-go/v72/paymentintent"
@@ -45,7 +47,8 @@ func (c *Card) CreatePaymentIntent(currency string, amount int) (*stripe.Payment
 	pi, err := paymentintent.New(params)
 	if err != nil {
 		msg := ""
-		if stripeErr, ok := err.(*stripe.Error); ok {
+		var stripeErr *stripe.Error
+		if errors.As(err, &stripeErr) {
 			msg = cardErrorMessage(stripeErr.Code)
 		}
 		return nil, msg, err
@@ -111,7 +114,8 @@ func (c *Card) CreateCustomer(pm, email string) (*stripe.Customer, string, error
 	cust, err := customer.New(customerParams)
 	if err != nil {
 		msg := ""
-		if stripeErr, ok := err.(*stripe.Error); ok {
+		var stripeErr *stripe.Error
+		if errors.As(err, &stripeErr) {
 			msg = cardErrorMessage(stripeErr.Code)
 		}
 		return nil, msg, err
@@ -152,7 +156,7 @@ func (c *Card) CancelSubscription(subID string) error {
 	return nil
 }
 
-// cardErrorMessage returns human readable versions of card error messages
+// cardErrorMessage returns human-readable versions of card error messages
 func cardErrorMessage(code stripe.ErrorCode) string {
 	var msg = ""
 	switch code {

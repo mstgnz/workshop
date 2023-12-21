@@ -23,7 +23,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data interf
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write(out)
+	_, _ = w.Write(out)
 
 	return nil
 }
@@ -49,7 +49,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, data in
 }
 
 // badRequest sends a JSON response with status http.StatusBadRequest, describing the error
-func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err error) error {
+func (app *application) badRequest(w http.ResponseWriter, _ *http.Request, err error) error {
 	var payload struct {
 		Error   bool   `json:"error"`
 		Message string `json:"message"`
@@ -65,7 +65,7 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write(out)
+	_, _ = w.Write(out)
 	return nil
 }
 

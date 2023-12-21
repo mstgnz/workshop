@@ -28,26 +28,26 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 
 	err := app.readJSON(w, r, &order)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	// generate a pdf invoice
 	err = app.createInvoicePDF(order)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
 	// create mail attachment
-	attachments := []string {
+	attachments := []string{
 		fmt.Sprintf("./invoices/%d.pdf", order.ID),
 	}
 
 	// send mail with attachment
 	err = app.SendMail("info@widgets.com", order.Email, "Your invoice", "invoice", attachments, nil)
 	if err != nil {
-		app.badRequest(w, r, err)
+		_ = app.badRequest(w, r, err)
 		return
 	}
 
@@ -58,7 +58,7 @@ func (app *application) CreateAndSendInvoice(w http.ResponseWriter, r *http.Requ
 	}
 	resp.Error = false
 	resp.Message = fmt.Sprintf("Invoice %d.pdf created and sent to %s", order.ID, order.Email)
-	app.writeJSON(w, http.StatusCreated, resp)
+	_ = app.writeJSON(w, http.StatusCreated, resp)
 }
 
 // createInvoicePDF generates a PDF version of the invoice
@@ -91,7 +91,7 @@ func (app *application) createInvoicePDF(order Order) error {
 	pdf.CellFormat(20, 8, fmt.Sprintf("%d", order.Quantity), "", 0, "C", false, 0, "")
 
 	pdf.SetX(185)
-	pdf.CellFormat(20, 8, fmt.Sprintf("$%.2f", float32(order.Amount / 100.0)), "", 0, "R", false, 0, "")
+	pdf.CellFormat(20, 8, fmt.Sprintf("$%.2f", float32(order.Amount/100.0)), "", 0, "R", false, 0, "")
 
 	invoicePath := fmt.Sprintf("./invoices/%d.pdf", order.ID)
 	err := pdf.OutputFileAndClose(invoicePath)

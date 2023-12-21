@@ -9,7 +9,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// writeJSON writes aribtrary data out as JSON
+// writeJSON writes arbitrary data out as JSON
 func (app *application) writeJSON(w http.ResponseWriter, status int, data interface{}, headers ...http.Header) error {
 	out, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
@@ -24,7 +24,7 @@ func (app *application) writeJSON(w http.ResponseWriter, status int, data interf
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write(out)
+	_, _ = w.Write(out)
 
 	return nil
 }
@@ -50,7 +50,7 @@ func (app *application) readJSON(w http.ResponseWriter, r *http.Request, data in
 }
 
 // badRequest sends a JSON response with status http.StatusBadRequest, describing the error
-func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err error) error {
+func (app *application) badRequest(w http.ResponseWriter, _ *http.Request, err error) error {
 	var payload struct {
 		Error   bool   `json:"error"`
 		Message string `json:"message"`
@@ -66,7 +66,7 @@ func (app *application) badRequest(w http.ResponseWriter, r *http.Request, err e
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
-	w.Write(out)
+	_, _ = w.Write(out)
 	return nil
 }
 
@@ -100,15 +100,15 @@ func (app *application) passwordMatches(hash, password string) (bool, error) {
 	return true, nil
 }
 
-func (app *application) failedValidation(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+func (app *application) failedValidation(w http.ResponseWriter, _ *http.Request, errors map[string]string) {
 	var payload struct {
-		Error bool `json:"error"`
-		Message string `json:"message"`
-		Errors map[string]string `json:"errors"`
+		Error   bool              `json:"error"`
+		Message string            `json:"message"`
+		Errors  map[string]string `json:"errors"`
 	}
 
 	payload.Error = true
 	payload.Message = "failed validation"
 	payload.Errors = errors
-	app.writeJSON(w, http.StatusUnprocessableEntity, payload)
+	_ = app.writeJSON(w, http.StatusUnprocessableEntity, payload)
 }
