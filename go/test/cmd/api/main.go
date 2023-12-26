@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
 	"github.com/mstgnz/workshop/go/test/pkg/repository"
 	"github.com/mstgnz/workshop/go/test/pkg/repository/dbrepo"
 )
@@ -12,9 +13,9 @@ import (
 const port = 8090
 
 type application struct {
-	DSN string
-	DB repository.DatabaseRepo
-	Domain string
+	DSN       string
+	DB        repository.DatabaseRepo
+	Domain    string
 	JWTSecret string
 }
 
