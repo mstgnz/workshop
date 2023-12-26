@@ -33,7 +33,9 @@ func (m *PostgresDBRepo) AllUsers() ([]*data.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func(rows *sql.Rows) {
+		_ = rows.Close()
+	}(rows)
 
 	var users []*data.User
 

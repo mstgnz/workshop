@@ -6,15 +6,16 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
 	"github.com/mstgnz/workshop/go/test/pkg/data"
 )
 
 func Test_application_addIPToContext(t *testing.T) {
-	tests := []struct{
-		headerName string
+	tests := []struct {
+		headerName  string
 		headerValue string
-		addr string
-		emptyAddr bool
+		addr        string
+		emptyAddr   bool
 	}{
 		{"", "", "", false},
 		{"", "", "", true},
@@ -23,7 +24,7 @@ func Test_application_addIPToContext(t *testing.T) {
 	}
 
 	// create a dummy handler that we'll use to check the context
-	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// make sure that the value exists in the context
 		val := r.Context().Value(contextUserKey)
 		if val == nil {
@@ -77,12 +78,12 @@ func Test_application_ipFromContext(t *testing.T) {
 }
 
 func Test_app_auth(t *testing.T) {
-	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	nextHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 	})
 
-	var tests = []struct{
-		name string
+	var tests = []struct {
+		name   string
 		isAuth bool
 	}{
 		{"logged in", true},
