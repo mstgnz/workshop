@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -30,7 +31,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer func(conn *sql.DB) {
+		_ = conn.Close()
+	}(conn)
 
 	app.DB = &dbrepo.PostgresDBRepo{DB: conn}
 
