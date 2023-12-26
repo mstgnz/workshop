@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
@@ -145,7 +146,7 @@ func (app *application) UploadProfilePic(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	// refresh the sessional variable "user"
+	// refresh the session variable "user"
 	updatedUser, err := app.DB.GetUser(user.ID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -179,12 +180,16 @@ func (app *application) UploadFiles(r *http.Request, uploadDir string) ([]*Uploa
 				if err != nil {
 					return nil, err
 				}
-				defer infile.Close()
+				defer func(infile multipart.File) {
+					_ = infile.Close()
+				}(infile)
 
 				uploadedFile.OriginalFileName = hdr.Filename
 
 				var outfile *os.File
-				defer outfile.Close()
+				defer func(outfile *os.File) {
+					_ = outfile.Close()
+				}(outfile)
 
 				if outfile, err = os.Create(filepath.Join(uploadDir, uploadedFile.OriginalFileName)); nil != err {
 					return nil, err

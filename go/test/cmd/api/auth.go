@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
 	"github.com/mstgnz/workshop/go/test/pkg/data"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -14,9 +15,8 @@ import (
 var jwtTokenExpiry = time.Minute * 15
 var refreshTokenExpiry = time.Hour * 24
 
-
 type TokenPairs struct {
-	Token string `json:"access_token"`
+	Token        string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 }
 
@@ -28,7 +28,7 @@ type Claims struct {
 func (app *application) getTokenFromHeaderAndVerify(w http.ResponseWriter, r *http.Request) (string, *Claims, error) {
 	// we expect our authorization header to look like this:
 	// Bearer <token>
-	// add a header 
+	// add a header
 	w.Header().Add("Vary", "Authorization")
 
 	// get the authorization header
@@ -56,7 +56,7 @@ func (app *application) getTokenFromHeaderAndVerify(w http.ResponseWriter, r *ht
 	claims := &Claims{}
 
 	// parse the token with our claims (we read into claims), using our secret (from the receiver)
-	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error){
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
 		// validate the signing algorithm
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexepected signing method: %v", token.Header["alg"])
@@ -110,7 +110,7 @@ func (app *application) generateTokenPair(user *data.User) (TokenPairs, error) {
 	refreshToken := jwt.New(jwt.SigningMethodHS256)
 	refreshTokenClaims := refreshToken.Claims.(jwt.MapClaims)
 	refreshTokenClaims["sub"] = fmt.Sprint(user.ID)
-	
+
 	// set expiry; must be longer than jwt expiry
 	refreshTokenClaims["exp"] = time.Now().Add(refreshTokenExpiry).Unix()
 
@@ -121,10 +121,9 @@ func (app *application) generateTokenPair(user *data.User) (TokenPairs, error) {
 	}
 
 	var tokenPairs = TokenPairs{
-		Token: signedAccessToken,
+		Token:        signedAccessToken,
 		RefreshToken: signedRefreshToken,
 	}
-
 
 	return tokenPairs, nil
 }

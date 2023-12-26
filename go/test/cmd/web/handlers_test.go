@@ -17,15 +17,16 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
 	"github.com/mstgnz/workshop/go/test/pkg/data"
 )
 
 func Test_application_handlers(t *testing.T) {
 	var theTests = []struct {
-		name               string
-		url                string
-		expectedStatusCode int
-		expectedURL string
+		name                    string
+		url                     string
+		expectedStatusCode      int
+		expectedURL             string
 		expectedFirstStatusCode int
 	}{
 		{"home", "/", http.StatusOK, "/", http.StatusOK},
@@ -150,49 +151,48 @@ func addContextAndSessionToRequest(req *http.Request, app application) *http.Req
 	return req.WithContext(ctx)
 }
 
-
 func Test_app_Login(t *testing.T) {
-	var tests = []struct{
-		name string
-		postedData url.Values
+	var tests = []struct {
+		name               string
+		postedData         url.Values
 		expectedStatusCode int
-		expectedLoc string
+		expectedLoc        string
 	}{
 		{
 			name: "valid login",
 			postedData: url.Values{
-				"email": {"admin@example.com"},
+				"email":    {"admin@example.com"},
 				"password": {"secret"},
 			},
 			expectedStatusCode: http.StatusSeeOther,
-			expectedLoc: "/user/profile",
+			expectedLoc:        "/user/profile",
 		},
 		{
 			name: "missing form data",
 			postedData: url.Values{
-				"email": {""},
+				"email":    {""},
 				"password": {""},
 			},
 			expectedStatusCode: http.StatusSeeOther,
-			expectedLoc: "/",
+			expectedLoc:        "/",
 		},
 		{
 			name: "user not found",
 			postedData: url.Values{
-				"email": {"you@there.com"},
+				"email":    {"you@there.com"},
 				"password": {"password"},
 			},
 			expectedStatusCode: http.StatusSeeOther,
-			expectedLoc: "/",
+			expectedLoc:        "/",
 		},
 		{
 			name: "bad credentials",
 			postedData: url.Values{
-				"email": {"admin@example.com"},
+				"email":    {"admin@example.com"},
 				"password": {"password"},
 			},
 			expectedStatusCode: http.StatusSeeOther,
-			expectedLoc: "/",
+			expectedLoc:        "/",
 		},
 	}
 
@@ -226,7 +226,7 @@ func Test_app_UploadFiles(t *testing.T) {
 	// create a new writer, of type *io.Writer
 	writer := multipart.NewWriter(pw)
 
-	// create a waitgroup, and add 1 to it
+	// create a wait group, and add 1 to it
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
@@ -255,7 +255,9 @@ func Test_app_UploadFiles(t *testing.T) {
 }
 
 func simulatePNGUpload(fileToUpload string, writer *multipart.Writer, t *testing.T, wg *sync.WaitGroup) {
-	defer writer.Close()
+	defer func(writer *multipart.Writer) {
+		_ = writer.Close()
+	}(writer)
 	defer wg.Done()
 
 	// create the form data filed 'file' with value being filename
@@ -269,7 +271,9 @@ func simulatePNGUpload(fileToUpload string, writer *multipart.Writer, t *testing
 	if err != nil {
 		t.Error(err)
 	}
-	defer f.Close()
+	defer func(f *os.File) {
+		_ = f.Close()
+	}(f)
 
 	// decode the image
 	img, _, err := image.Decode(f)
@@ -312,7 +316,7 @@ func Test_app_UploadProfilePic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mw.Close()
+	_ = mw.Close()
 
 	req := httptest.NewRequest(http.MethodPost, "/upload", body)
 	req = addContextAndSessionToRequest(req, app)

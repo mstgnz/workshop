@@ -3,9 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
 	"log"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
 )
 
 type application struct {
