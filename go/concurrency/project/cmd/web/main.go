@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/gob"
-	"final-project/data"
 	"fmt"
 	"log"
 	"net/http"
@@ -19,6 +18,7 @@ import (
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
 	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/mstgnz/workshop/go/concurrency/project/data"
 )
 
 const webPort = "80"
@@ -41,13 +41,13 @@ func main() {
 
 	// set up the application config
 	app := Config{
-		Session:  session,
-		DB:       db,
-		InfoLog:  infoLog,
-		ErrorLog: errorLog,
-		Wait:     &wg,
-		Models:   data.New(db),
-		ErrorChan: make(chan error),
+		Session:       session,
+		DB:            db,
+		InfoLog:       infoLog,
+		ErrorLog:      errorLog,
+		Wait:          &wg,
+		Models:        data.New(db),
+		ErrorChan:     make(chan error),
 		ErrorChanDone: make(chan bool),
 	}
 
@@ -146,7 +146,7 @@ func openDB(dsn string) (*sql.DB, error) {
 // initSession sets up a session, using Redis for session store
 func initSession() *scs.SessionManager {
 	gob.Register(data.User{})
-	
+
 	// set up session
 	session := scs.New()
 	session.Store = redisstore.New(initRedis())
@@ -204,16 +204,16 @@ func (app *Config) createMail() Mail {
 	mailerDoneChan := make(chan bool)
 
 	m := Mail{
-		Domain: "localhost",
-		Host: "localhost",
-		Port: 1025,
-		Encryption: "none",
-		FromName: "Info",
+		Domain:      "localhost",
+		Host:        "localhost",
+		Port:        1025,
+		Encryption:  "none",
+		FromName:    "Info",
 		FromAddress: "info@mycompany.com",
-		Wait: app.Wait,
-		ErrorChan: errorChan,
-		MailerChan: mailerChan,
-		DoneChan: mailerDoneChan,
+		Wait:        app.Wait,
+		ErrorChan:   errorChan,
+		MailerChan:  mailerChan,
+		DoneChan:    mailerDoneChan,
 	}
 
 	return m
