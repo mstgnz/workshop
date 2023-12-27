@@ -405,7 +405,7 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 	testURL := fmt.Sprintf("%s%s", app.config.frontend, theURL)
 
 	signer := urlsigner.Signer{
-		Secret: []byte(app.config.secretkey),
+		Secret: []byte(app.config.secretKey),
 	}
 
 	valid := signer.VerifyToken(testURL)
@@ -423,7 +423,7 @@ func (app *application) ShowResetPassword(w http.ResponseWriter, r *http.Request
 	}
 
 	encyrptor := encryption.Encryption{
-		Key: []byte(app.config.secretkey),
+		Key: []byte(app.config.secretKey),
 	}
 
 	encryptedEmail, err := encyrptor.Encrypt(email)
