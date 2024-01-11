@@ -1,0 +1,88 @@
+swagger: "2.0"
+info:
+  title: User API
+  description: An API for managing users
+  version: 1.0.0
+
+paths:
+  /users:
+    get:
+      operationId: usersList
+      description: List of users.
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          description: Specifies the page.
+      responses:
+        200:
+          description: Lists users.
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+  /users/create:
+    post:
+      operationId: usersCreate
+      description: Creates new users.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: user
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+      responses:
+        201:
+          description: User created.
+  /users/update:
+    put:
+      operationId: usersUpdate
+      description: Updates the specified user.
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: User ID.
+        - name: user
+          in: body
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+      responses:
+        200:
+          description: User updated.
+  /users/delete:
+    delete:
+      operationId: usersDelete
+      description: Deletes the specified user.
+      parameters:
+        - name: id
+          in: path
+          type: integer
+          required: true
+          description: User ID.
+      responses:
+        204:
+          description: User deleted.

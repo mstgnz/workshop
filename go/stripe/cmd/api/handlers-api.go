@@ -508,7 +508,7 @@ func (app *application) SendPasswordResetEmail(w http.ResponseWriter, r *http.Re
 	link := fmt.Sprintf("%s/reset-password?email=%s", app.config.frontend, payload.Email)
 
 	sign := urlsigner.Signer{
-		Secret: []byte(app.config.secretkey),
+		Secret: []byte(app.config.secretKey),
 	}
 
 	signedLink := sign.GenerateTokenFromString(link)
@@ -551,7 +551,7 @@ func (app *application) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	encyrptor := encryption.Encryption{
-		Key: []byte(app.config.secretkey),
+		Key: []byte(app.config.secretKey),
 	}
 
 	realEmail, err := encyrptor.Decrypt(payload.Email)
