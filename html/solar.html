@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Solar System</title>
+	<style>
+		body{
+			margin: 0;
+			height: 100vh;
+			display: flex;
+			overflow: hidden;
+			align-items: center;
+			justify-content: center;
+			background-color: black;
+		}
+		.container{
+			width: 40em;
+			height: 40em;
+			font-size: 10px;
+			position: relative;
+		}
+		.sun{
+			top: 15em;
+			left: 15em;
+			width: 10em;
+			height: 10em;
+			position: absolute;
+			border-radius: 50%;
+			background-color: yellow;
+			box-shadow: 0 0 3em white;
+		}
+		.earth, .moon{
+			position: absolute;
+			border-radius: 50%;
+			border-style: solid;
+			border-width: 0 0 0.05em 0.05em;
+			border-color: transparent  transparent transparent silver;
+		}
+		.earth{
+			top: 5em;
+			left: 5em;
+			width: 30em;
+			height: 30em;
+			animation: orbit 36.5s linear infinite;
+		}
+		.moon{
+			left: 0;
+			bottom: 0;
+			width: 8em;
+			height: 8em;
+			animation: orbit 2.7s linear infinite;
+		}
+		.earth::before, .moon::before{
+			content: '';
+			position: absolute;
+			border-radius: 50%;
+		}
+		.earth::before{
+			left: 3em;
+			width: 3em;
+			height: 3em;
+			bottom: 3em;
+			box-shadow: 0 0 0.8em aqua;
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAMAAAAM7l6QAAAABGdBTUEAALGPC/xhBQAAAGBQTFRFGDRdAyFNIDxkQld5CCZTIztsJD1lAAAArsblO230dJfgP2vUnLbbbovAOF2vN1GERnb0Un/yW3asWH3PeY+uhKfyYXaVjafNT2WNeJ3zv9f0nrzzX4rzkLHzrcjzbZX0L9IPbAAAAAh0Uk5TfSC49Uv+4wC/XoCAAAACEUlEQVQoz12T2WKrMAxECWDC4n1fZOv//7IiaXp760cOtkaj0fT8nHXe1LLEmJd5/fk4feDGGFPeR0U/5G39H290zXohhJUi+czY9gs/lhytsM4JvvPEebJZsccH3zSldDrX6uhw8jMl/+Y33nKWibdQChhTsDRzXdbm5Y1nla1LYxAwGjsChvPmcb7xGrMVrtemQdPB0ltt6C6Z80p4y164CxpqMMcBZdRWey9O2rg9p5VlIS5ttMGCiGFUgn20xoXP6zQrJd2JAKW83q11tF5Cb9zZPE9btPIcI5AmLKXXEfoIASGchLeJ5eTCKNA7GMReu8HR26AGLqnUxFRyF3U7aqFrpQVjXrXBOJGXKUexl5fgPsgzqjpIV2sAztk4ZZ/2gVBqfb8NJH/QwcC5j1P0KTU0UOttKrUHh8Y2qL/9jcUZAsCrJTwOHYyG3so3XrJNJ7U1Xn4UfWiAW1nrPPllmqk4v1lrRQMarQ2QPKonBNmyLlScGg1Ik6C6QG8XbA3P5NlKI6EonGHoA2gY5BwZVqAAReIeyXNlyvJ9DJpWozcPU8hzJFNsvAf6pIySOooDUBA6tRBCP5OUav4OE1NSXHu9nQ+kn9LiklXbTxSJS7fvt1kAx+Wc9H57/Aty9FImms3Or+uSBOPy+LUGc/RkT6KgO0lVY57/LpHKlEnrvacV+LtE7xVkSuW8bL9W8AvOdz8ZXmQqKAAAAABJRU5ErkJggg==);
+		}
+		.moon::before{
+			left: 0.2em;
+			width: 1.2em;
+			bottom: 0.8em;
+			height: 1.2em;
+			background-color: silver;
+			box-shadow: 0 0 1em silver;
+		}
+		@keyframes orbit{
+			to{
+				transform: rotate(-360deg);
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="sun"></div>
+		<div class="earth">
+			<div class="moon"></div>
+		</div>
+	</div>
+</body>
+</html>
