@@ -1,0 +1,92 @@
+openapi: 3.0.1
+info:
+  description: An API for managing users
+  title: User API
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /users:
+    get:
+      description: List of users.
+      operationId: usersList
+      parameters:
+      - description: Specifies the page.
+        in: query
+        name: page
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/usersList_200_response_inner'
+                type: array
+          description: Lists users.
+  /users/create:
+    post:
+      description: Creates new users.
+      operationId: usersCreate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usersList_200_response_inner'
+        required: false
+      responses:
+        "201":
+          content: {}
+          description: User created.
+      x-codegen-request-body-name: user
+  /users/update:
+    put:
+      description: Updates the specified user.
+      operationId: usersUpdate
+      parameters:
+      - description: User ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/usersList_200_response_inner'
+        required: false
+      responses:
+        "200":
+          content: {}
+          description: User updated.
+      x-codegen-request-body-name: user
+  /users/delete:
+    delete:
+      description: Deletes the specified user.
+      operationId: usersDelete
+      parameters:
+      - description: User ID.
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          content: {}
+          description: User deleted.
+components:
+  schemas:
+    usersList_200_response_inner:
+      example:
+        name: name
+        id: 0
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+      type: object
+x-original-swagger-version: "2.0"

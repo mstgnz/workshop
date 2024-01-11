@@ -1,0 +1,16 @@
+.gitignore
+.openapi-generator-ignore
+.travis.yml
+README.md
+api/openapi.yaml
+api_default.go
+client.go
+configuration.go
+docs/DefaultApi.md
+docs/UsersList200ResponseInner.md
+git_push.sh
+go.mod
+go.sum
+model_users_list_200_response_inner.go
+response.go
+utils.go
