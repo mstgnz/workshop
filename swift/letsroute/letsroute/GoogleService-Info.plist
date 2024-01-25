@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>804921182623-eppbv119o1jj46nearsp1vtenboubfrq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.804921182623-eppbv119o1jj46nearsp1vtenboubfrq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD3OEIWwoo4piG3lFJvX9dWl4NFm5doW_s</string>
+	<key>GCM_SENDER_ID</key>
+	<string>804921182623</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.mesutgenez.letsroute</string>
+	<key>PROJECT_ID</key>
+	<string>letsroute-3e309</string>
+	<key>STORAGE_BUCKET</key>
+	<string>letsroute-3e309.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:804921182623:ios:e38fb7b0b4831659aa95aa</string>
+	<key>DATABASE_URL</key>
+	<string>https://letsroute-3e309.firebaseio.com</string>
+</dict>
+</plist>
