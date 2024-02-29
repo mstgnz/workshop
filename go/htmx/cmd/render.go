@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path"
 )
@@ -20,7 +19,6 @@ func render(w http.ResponseWriter, page string, data map[string]any, partials ..
 		}
 
 		templateFiles := append(partialPaths, path.Join("./template/pages", fmt.Sprintf("%s.gohtml", page)), path.Join("./template/index.gohtml"))
-		log.Println(templateFiles)
 		t, err = template.ParseFiles(templateFiles...)
 	} else {
 		t, err = template.ParseFiles(path.Join("./template/pages", fmt.Sprintf("%s.gohtml", page)), path.Join("./template/index.gohtml"))
