@@ -1,5 +1,13 @@
-// init tippy
-tippy(".avatar");
+document.addEventListener("DOMContentLoaded", (event) => {
+    // init tinymce
+    tinymce.init({
+        selector: '#tinymce',
+        plugins: 'autolink lists link image charmap preview anchor pagebreak',
+        toolbar_mode: 'floating',
+    })
+    // init tippy
+    tippy(".avatar")
+})
 
 /* Progress bar */
 //Source: https://alligator.io/js/progress-bar-javascript-css-variables/
@@ -29,7 +37,7 @@ document.addEventListener("scroll", function () {
         header.classList.add("fadeOutUp");
         header.classList.add("hidden");
     }
-});
+})
 
 // scroll to top
 const t = document.querySelector(".js-scroll-top");
