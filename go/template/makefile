@@ -1,5 +1,2 @@
 run:
-	go build -o ./cmd/build ./cmd && ./cmd/build
-
-clean:
-	rm -f main
+	find . -type f -name '*.go' | entr -r sh -c 'go build -o /tmp/build ./cmd && /tmp/build'
